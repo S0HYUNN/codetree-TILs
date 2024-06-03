@@ -130,4 +130,4 @@ for _ in range(k):
     else:
         score += flag_stop
 
-    print(score, end = '')
+    print(score, end = ' ')
