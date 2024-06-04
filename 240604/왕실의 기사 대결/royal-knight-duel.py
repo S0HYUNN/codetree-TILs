@@ -21,6 +21,7 @@ def push_unit(start, dr):
     while q:
         cur = q.pop(0)
         ci, cj, h, w, k = units[cur]
+
         ni, nj = ci + di[dr], cj + dj[dr]
         for i in range(ni, ni+h):
             for j in range(nj, nj+w):
@@ -35,7 +36,7 @@ def push_unit(start, dr):
 
             ti, tj, th, tw, tk = units[idx]
 
-            if ni <= ti+th-1 and ni+h-1 >= ti and tj <= nj+w-1 and nj <= tj+w-1:
+            if ni <= ti+th-1 and ni+h-1 >= ti and tj <= nj+w-1 and nj <= tj+tw-1:
                 q.append(idx)
                 pset.add(idx)
 
