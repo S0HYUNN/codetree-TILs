@@ -1,110 +1,73 @@
-import sys
 from collections import deque
 
-sys.setrecursionlimit(10000)
+R, C, K = map(int, input().split())
+arr = [[0 for _ in range(C)] for __ in range(R+3)]
 
-def init_map():
-    global m
-    m = [[-1] * C for _ in range(R)]
+di, dj = [-1, 0, 1, 0], [0, 1, 0, -1]
 
-def drop(idx, ci, cj, e):
-    global score, rMax
+def set_position(n, board, col):
+    q = deque()
+    q.append([1, col])
+    l_c, r_c = 0, 0
 
-    while True:
-        if ci == R - 2:
-            break  # exit at bottom
+    while q:
+        ci, cj = q.popleft()
 
-        # go down
-        if (ci == -2 and m[ci + 2][cj] == -1) or (m[ci + 2][cj] == -1 and m[ci + 1][cj - 1] == -1 and m[ci + 1][cj + 1] == -1):
-            ci += 1
-            continue
+        # 아래로 내려갈 수 있음
+        if 0 <= ci + 2 < R + 3 and 0 <= cj < C and board[ci + 2][cj] == 0 and board[ci + 1][cj + 1] == 0 and board[ci + 1][cj - 1] == 0:
+            q.append([ci + 1, cj])
+        else:
+            # 왼쪽으로 내려갈 수 있음
+            if 0 <= ci + 2 < R + 3 and 0 <= cj - 2 < C and board[ci][cj - 2] == 0 and board[ci - 1][cj - 1] == 0 and board[ci + 1][cj - 1] == 0 and board[ci + 1][cj - 2] == 0 and board[ci + 2][cj - 1] == 0:
+                q.append([ci + 1, cj - 1])
+                l_c += 1
+            # 오른쪽으로 내려갈 수 있음
+            elif 0 <= ci + 2 < R + 3 and 0 <= cj + 2 < C and board[ci][cj + 2] == 0 and board[ci - 1][cj + 1] == 0 and board[ci + 1][cj + 1] == 0 and board[ci + 1][cj + 2] == 0 and board[ci + 2][cj + 1] == 0:
+                q.append([ci + 1, cj + 1])
+                r_c += 1
+            else:
+                return [ci, cj], l_c, r_c
 
-        # go left
-        if cj >= 2:
-            if (ci == -2 and m[ci + 2][cj - 1] == -1) or ((ci == -1) and m[ci + 2][cj - 1] == -1 and m[ci + 1][cj - 1] == -1 and m[ci + 1][cj - 2] == -1) or (m[ci + 2][cj - 1] == -1 and m[ci + 1][cj - 1] == -1 and m[ci + 1][cj - 2] == -1 and m[ci][cj - 2] == -1):
-                ci += 1
-                cj -= 1
-                e = (e + 3) % 4
-                continue
+def bfs(board, x, y):
+    q = deque()
+    v = [[0] * len(board[0]) for _ in range(len(board))]
+    v[x][y] = 1
+    q.append([x, y])
+    max_row = x
 
-        # go right
-        if cj < C - 2:
-            if (ci == -2 and m[ci + 2][cj + 1] == -1) or ((ci == -1) and m[ci + 2][cj + 1] == -1 and m[ci + 1][cj + 1] == -1 and m[ci + 1][cj + 2] == -1) or (m[ci + 2][cj + 1] == -1 and m[ci + 1][cj + 1] == -1 and m[ci + 1][cj + 2] == -1 and m[ci][cj + 2] == -1):
-                ci += 1
-                cj += 1
-                e = (e + 1) % 4
-                continue
+    while q:
+        ci, cj = q.popleft()
+        max_row = max(ci, max_row)
 
-        # exit when cannot go anymore
-        break
+        for d in range(4):
+            ni, nj = ci + di[d], cj + dj[d]
+            if 0 <= ni < R + 3 and 0 <= nj < C and abs(board[ci][cj]) == abs(board[ni][nj]) and v[ni][nj] == 0 and board[ni][nj] != 0:
+                q.append([ni, nj])
+                v[ni][nj] = 1
+            elif board[ci][cj] < 0 and 0 <= ni < R + 3 and 0 <= nj < C and v[ni][nj] == 0 and board[ni][nj] != 0:
+                q.append([ni, nj])
+                v[ni][nj] = 1
 
-    # reset if golem located outside of the map
-    if ci <= 0:
-        init_map()
-        return
+    return max_row
 
-    # mark golem on map
-    m[ci][cj] = m[ci - 1][cj] = m[ci][cj + 1] = m[ci + 1][cj] = m[ci][cj - 1] = idx
-    gArr[idx] = (ci, cj, e)
+total = 0
+for i in range(1, K+1):
+    c, d = map(int, input().split())
+    c, l, r = set_position(i, arr, c-1)
+    rot = (d + (r-l))%4
+    x, y = c[0], c[1]
 
-    move_golem(idx)
-    score += rMax
+    if x <= 3:
+        arr = [[0 for _ in range(C)] for __ in range(R+3)]
+    else:
+        arr[x][y] = i
+        arr[x + 1][y] = i
+        arr[x - 1][y] = i
+        arr[x][y + 1] = i
+        arr[x][y - 1] = i
+        arr[x + di[rot]][y + dj[rot]] = -i
 
-def move_golem(idx):
-    global rMax
-    v[idx] = True  # visited
+        score = bfs(arr, x, y) - 2
+        total += score
 
-    # update rMax with the bottom of current golem
-    ri = gArr[idx][0] + 2
-    rMax = max(ri, rMax)
-
-    # exit coord of current golem
-    e = gArr[idx][2]
-    ri = gArr[idx][0] + di[e]
-    rj = gArr[idx][1] + dj[e]
-
-    # find next golem close to current colem's exit
-    for d in range(4):
-        ni = ri + di[d]
-        nj = rj + dj[d]
-
-        if ni < 0 or ni >= R or nj < 0 or nj >= C:
-            continue
-        if m[ni][nj] == -1 or v[m[ni][nj]]:
-            continue
-
-        move_golem(m[ni][nj])
-
-if __name__ == "__main__":
-    import sys
-    input = sys.stdin.read
-    data = input().split()
-    
-    idx = 0
-    
-    R = int(data[idx])
-    idx += 1
-    C = int(data[idx])
-    idx += 1
-    K = int(data[idx])
-    idx += 1
-    
-    score = 0
-    init_map()
-    gArr = [None] * K
-    
-    di = [-1, 0, 1, 0]
-    dj = [0, 1, 0, -1]
-    
-    for k in range(K):
-        c = int(data[idx]) - 1
-        idx += 1
-        e = int(data[idx])
-        idx += 1
-        
-        # init every try
-        rMax = 0
-        v = [False] * K
-        drop(k, -2, c, e)
-    
-    print(score)
+print(total)
