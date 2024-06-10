@@ -33,7 +33,7 @@ def bfs(si, sj, ei, ej):
 def bomb(si, sj, ei, ej):
     d = arr[si][sj]
     arr[ei][ej] = max(0, arr[ei][ej] - d)
-    for di, dj in ((-1, -1), (-1, 0), (-1, 1), (0, 1), (0, -1), (1, -1), (1, 0), (1, 1)):
+    for di, dj in ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)):
         ni, nj = (ei+di) % N, (ej+dj) % M
         if (ni, nj) != (si, sj):
             arr[ni][nj] = max(0, arr[ni][nj]-d//2)
@@ -59,7 +59,7 @@ for T in range(1, K+1):
             if mx < arr[i][j] or (mx == arr[i][j] and mn_turn > turn[i][j]) or \
                 (mx == arr[i][j] and mn_turn == turn[i][j] and ei+ej > i+j) or \
                 (mx == arr[i][j] and mn_turn == turn[i][j] and ei+ej == i+j and ej > j):
-                mn, mx_turn, ei, ej = arr[i][j], turn[i][j], i, j
+                mx, mn_turn, ei, ej = arr[i][j], turn[i][j], i, j
     
     # 2-2) 레이저 공격 (우하좌상 순서로 최단 거리 이동 - BFS, %N, %M 처리 필요(양끝연결))
     arr[si][sj] += (N+M)
