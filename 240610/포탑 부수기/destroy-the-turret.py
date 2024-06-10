@@ -81,7 +81,7 @@ for T in range(1, K+1):
     cnt = N * M
     for lst in arr:
         cnt -= lst.count(0)
-    if cnt <= -1:
+    if cnt <= 1:
         break
 
 print(max(map(max, arr)))
