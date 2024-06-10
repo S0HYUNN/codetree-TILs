@@ -32,7 +32,7 @@ def bfs(si, sj, ei, ej):
 
 def bomb(si, sj, ei, ej):
     d = arr[si][sj]
-    arr[ei][ej] = amx(0, arr[ei][ej] - d)
+    arr[ei][ej] = max(0, arr[ei][ej] - d)
     for di, dj in ((-1, -1), (-1, 0), (-1, 1), (0, 1), (0, -1), (1, -1), (1, 0), (1, 1)):
         ni, nj = (ei+di) % N, (ej+dj) % M
         if (ni, nj) != (si, sj):
