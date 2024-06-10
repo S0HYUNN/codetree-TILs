@@ -2,7 +2,7 @@ N, M, K = map(int, input().split())
 arr = [list(map(int, input().split())) for _ in range(N)]
 for _ in range(M):
     i, j = map(lambda x: int(x)-1, input().split())
-    arr[i][j] = -1
+    arr[i][j] -= 1
 
 ei, ej = map(lambda x: int(x)-1, input().split())
 arr[ei][ej] = -11
