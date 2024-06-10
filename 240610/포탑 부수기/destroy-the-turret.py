@@ -54,7 +54,7 @@ for T in range(1, K+1):
     # 2-1) 공격 당할 포탑 선정: 공격력 높은 -> 가장 오래전 공격 -> 행 + 열(작은) -> 열(작은)
     mx, mn_turn, ei, ej = 0, T, N, M
     for i in range(N):
-        for j in range(N):
+        for j in range(M):
             if arr[i][j] <= 0:  continue
             if mx < arr[i][j] or (mx == arr[i][j] and mn_turn > turn[i][j]) or \
                 (mx == arr[i][j] and mn_turn == turn[i][j] and ei+ej > i+j) or \
